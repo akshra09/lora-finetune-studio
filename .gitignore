@@ -1,0 +1,49 @@
+# ─── Python ───────────────────────────────
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+
+# Training outputs (large files — add to git only if small)
+training/outputs/
+training/data/*.json
+!training/data/dataset.json   # keep the sample dataset
+
+# ─── Node / Next.js ───────────────────────
+node_modules/
+app/.next/
+app/out/
+app/.vercel/
+
+# ─── Environment ──────────────────────────
+.env
+.env.local
+.env.*.local
+*.env
+
+# ─── OS ───────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ─── Editor ───────────────────────────────
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+
+# ─── ML artifacts ─────────────────────────
+*.safetensors
+*.bin
+*.pt
+*.pth
+wandb/
+mlruns/
+
+# ─── Jupyter ──────────────────────────────
+.ipynb_checkpoints/

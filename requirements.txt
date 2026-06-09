@@ -1,0 +1,39 @@
+# LoRA Fine-Tuning Studio - Python Requirements
+# Install with: pip install -r requirements.txt
+
+# Core ML / Training
+torch>=2.1.0
+torchvision>=0.16.0
+transformers>=4.40.0
+peft>=0.10.0
+trl>=0.8.0
+datasets>=2.18.0
+accelerate>=0.29.0
+bitsandbytes>=0.43.0       # QLoRA 4-bit quantization (Linux/CUDA)
+sentencepiece>=0.2.0
+tokenizers>=0.19.0
+safetensors>=0.4.3
+
+# Evaluation
+evaluate>=0.4.1
+rouge-score>=0.1.2
+nltk>=3.8.1
+scikit-learn>=1.4.0
+
+# HuggingFace Hub integration
+huggingface-hub>=0.22.0
+
+# Training utilities
+wandb>=0.16.6              # Experiment tracking (optional, set WANDB_DISABLED=true to skip)
+tensorboard>=2.16.2
+scipy>=1.13.0
+
+# Config & CLI
+pyyaml>=6.0.1
+click>=8.1.7
+rich>=13.7.1               # Beautiful terminal output
+python-dotenv>=1.0.1
+
+# Data processing
+pandas>=2.2.0
+numpy>=1.26.4

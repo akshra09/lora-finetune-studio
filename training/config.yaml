@@ -1,0 +1,182 @@
+# LoRA Fine-Tuning Configuration
+# Edit these values to customize your training run.
+
+# ─────────────────────────────────────────────
+# MODEL
+# ─────────────────────────────────────────────
+model:
+  # HuggingFace model ID for the base model
+  # Good starting points (pick one):
+  #   "TinyLlama/TinyLlama-1.1B-Chat-v1.0"   — 1.1B, ~6GB VRAM
+  #   "microsoft/phi-2"                        — 2.7B, ~8GB VRAM
+  #   "mistralai/Mistral-7B-Instruct-v0.2"    — 7B,  ~16GB VRAM
+  #   "meta-llama/Llama-3-8B-Instruct"        — 8B,  ~20GB VRAM
+  base_model: "TinyLlama/TinyLlama-1.1B-Chat-v1.0"
+
+  # Max token sequence length (reduce to save VRAM)
+  max_length: 512
+
+  # Use Flash Attention 2 for faster training (requires compatible GPU)
+  use_flash_attention: false
+
+# ─────────────────────────────────────────────
+# LoRA HYPERPARAMETERS
+# ─────────────────────────────────────────────
+lora:
+  # Rank — the "r" in LoRA. Higher = more capacity but more VRAM.
+  # Common values: 8, 16, 32, 64
+  r: 16
+
+  # Alpha — scaling factor. Usually set to 2x rank.
+  alpha: 32
+
+  # Dropout applied to LoRA layers
+  dropout: 0.05
+
+  # Which attention layers to inject LoRA into.
+  # For most models: ["q_proj", "v_proj"]
+  # For more capacity: ["q_proj", "k_proj", "v_proj", "o_proj"]
+  target_modules:
+    - "q_proj"
+    - "v_proj"
+    - "k_proj"
+    - "o_proj"
+
+  # Apply LoRA to linear layers as well (increases quality)
+  bias: "none"
+  task_type: "CAUSAL_LM"
+
+# ─────────────────────────────────────────────
+# QUANTIZATION (QLoRA)
+# ─────────────────────────────────────────────
+quantization:
+  # Enable 4-bit quantization (QLoRA) — recommended for limited VRAM
+  use_4bit: true
+  # Data type for 4-bit base model ("nf4" or "fp4")
+  bnb_4bit_quant_type: "nf4"
+  # Use double quantization (saves a bit more memory)
+  use_double_quant: true
+  # Compute dtype for 4-bit layers
+  bnb_4bit_compute_dtype: "bfloat16"
+
+# ─────────────────────────────────────────────
+# DATASET
+# ─────────────────────────────────────────────
+dataset:
+  # Either a HuggingFace dataset ID or "local" to use data/dataset.json
+  name: "yahma/alpaca-cleaned"
+
+  # For HF datasets: which split to use
+  split: "train"
+
+  # Column names in the dataset
+  instruction_column: "instruction"
+  input_column: "input"
+  output_column: "output"
+
+  # Fraction of data to use (1.0 = full dataset, 0.1 = 10% for quick testing)
+  sample_fraction: 1.0
+
+  # Hold out for validation
+  val_split_ratio: 0.05
+
+  # Prompt template (Alpaca-style)
+  prompt_template: |
+    ### Instruction:
+    {instruction}
+
+    ### Input:
+    {input}
+
+    ### Response:
+    {output}
+
+  prompt_template_no_input: |
+    ### Instruction:
+    {instruction}
+
+    ### Response:
+    {output}
+
+# ─────────────────────────────────────────────
+# TRAINING
+# ─────────────────────────────────────────────
+training:
+  # Output directory for checkpoints
+  output_dir: "outputs"
+
+  # Number of training epochs
+  num_epochs: 3
+
+  # Batch size per GPU (reduce if OOM)
+  per_device_train_batch_size: 4
+  per_device_eval_batch_size: 4
+
+  # Gradient accumulation (effective batch = batch_size × grad_accum)
+  gradient_accumulation_steps: 4
+
+  # Learning rate
+  learning_rate: 2.0e-4
+
+  # LR scheduler
+  lr_scheduler_type: "cosine"
+
+  # Warmup steps / ratio
+  warmup_ratio: 0.03
+
+  # Weight decay
+  weight_decay: 0.001
+
+  # Optimizer
+  optimizer: "paged_adamw_32bit"
+
+  # Enable gradient checkpointing (saves VRAM, slightly slower)
+  gradient_checkpointing: true
+
+  # Save checkpoints every N steps (0 = only save at end)
+  save_steps: 100
+
+  # Evaluate every N steps (0 = only evaluate at end)
+  eval_steps: 100
+
+  # Log every N steps
+  logging_steps: 10
+
+  # Max steps (-1 = train for full epochs)
+  max_steps: -1
+
+  # Mixed precision training
+  fp16: false
+  bf16: true   # Preferred on Ampere+ GPUs (A100, 3090, 4090)
+
+  # Seed for reproducibility
+  seed: 42
+
+  # Group sequences by length (faster training)
+  group_by_length: true
+
+  # Pack sequences (very fast, experimental)
+  packing: false
+
+# ─────────────────────────────────────────────
+# EXPERIMENT TRACKING
+# ─────────────────────────────────────────────
+tracking:
+  # Use Weights & Biases (set WANDB_API_KEY env var, or set disabled: true)
+  wandb:
+    enabled: false
+    project: "lora-finetune-studio"
+    run_name: "tinyllama-alpaca-lora"
+
+  # Use TensorBoard (always safe to enable)
+  tensorboard: true
+
+# ─────────────────────────────────────────────
+# HF HUB
+# ─────────────────────────────────────────────
+hub:
+  # Push to HuggingFace Hub after training?
+  push_to_hub: false
+  # Your repo: "username/model-name"
+  repo_id: "YOUR_HF_USERNAME/tinyllama-alpaca-lora"
+  private: false

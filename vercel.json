@@ -1,0 +1,29 @@
+{
+  "version": 2,
+  "name": "lora-finetune-studio",
+  "buildCommand": "cd app && npm install && npm run build",
+  "outputDirectory": "app/.next",
+  "installCommand": "cd app && npm install",
+  "framework": "nextjs",
+  "rootDirectory": "app",
+  "env": {
+    "HUGGINGFACE_API_KEY": "@huggingface_api_key",
+    "DEFAULT_MODEL_ID": "@default_model_id"
+  },
+  "build": {
+    "env": {
+      "NEXT_PUBLIC_DEFAULT_MODEL": "@default_model_id"
+    }
+  },
+  "regions": ["iad1"],
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        { "key": "Access-Control-Allow-Methods", "value": "GET, POST, OPTIONS" },
+        { "key": "Access-Control-Allow-Headers", "value": "Content-Type, Authorization" }
+      ]
+    }
+  ]
+}
